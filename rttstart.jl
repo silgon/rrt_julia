@@ -1,9 +1,9 @@
 # start = Float64[0, 0, 0]
 # goal = Float64[10, 10, π]
-start = Float64[0, 0]
+start = Float64[1, 1]
 goal = Float64[10, 10]
 ε = 0.5 # meters
-n_iter = 10000
+n_iter = 8000
 using Graphs
 
 g = graph(Int[], Graphs.IEdge[], is_directed=true)
@@ -40,9 +40,6 @@ end
 # RRT algorithm
 for i in 1:n_iter
     r_v = rand(2).*Float64[10,10] # random vertex
-    if !is_allowed(r_v)
-        continue
-    end
     c_v = id_start # closest vertex
     for p in g.vertices
         if dist(r_v, nodes[p]) < dist(nodes[c_v], nodes[p])
@@ -52,8 +49,46 @@ for i in 1:n_iter
 
     # create new vertex and edge
     n_v = stop_from_to(nodes[c_v], r_v)
+
+    # check if allowed
+    if !is_allowed(n_v)
+        continue
+    end
+
     push!(nodes, n_v)
     new_id = length(nodes)
     add_vertex!(g, new_id) # start
     add_edge!(g, c_v, new_id)
 end
+println("Plotting data")
+m_nodes = hcat(nodes...)' # matrix with value of nodes
+using PyCall, PyPlot
+@pyimport seaborn as sns
+plt = sns.plt
+plt[:clf]()
+for ed in g.edges
+    plt[:plot](m_nodes[[ed.source, ed.target],1],
+               m_nodes[[ed.source, ed.target],2], "b", linewidth=0.3)
+end
+
+# find closest node to goal
+g_v = id_start # closest vertex
+for p in g.vertices
+    if dist(goal, nodes[p]) < dist(nodes[g_v], nodes[p])
+        g_v = p
+    end
+end
+
+# navigate from goal to beginning
+c_v = g_v # current vertex
+while true
+    ie = in_edges(c_v, g)  # only has one parent (from the algorithm)
+    if length(ie)==0
+        break
+    end
+    plt[:plot](m_nodes[[ie[1].source, c_v],1], m_nodes[[ie[1].source, c_v],2], "r")
+    c_v = ie[1].source
+end
+    
+
+

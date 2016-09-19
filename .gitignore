@@ -1,0 +1,11 @@
+[Bb]in/
+[Bb]uild/
+Distutils.egg-info/
+*~
+\#*#
+*.swp
+*.swo
+.\#*
+*.pyc
+results/
+mount/
