@@ -1,9 +1,9 @@
-# start = Float64[0, 0, 0]
-# goal = Float64[10, 10, π]
-start = Float64[1, 1]
-goal = Float64[10, 10]
+start = Float64[3, 3, π/4]
+goal = Float64[8, 2, -π/4]
 ε = 0.4 # meters
-n_iter = 8000
+α = pi/16
+k_α = .3
+n_iter = 15000
 using Graphs
 
 g = graph(Int[], Graphs.IEdge[], is_directed=true)
@@ -25,21 +25,22 @@ function is_allowed(state::Array{Float64, 1})
 end
 
 function dist(p1::Array{Float64,1}, p2::Array{Float64,1})
-    sqrt((p1[1]-p2[1])^2+(p1[2]-p2[2])^2)
+    sqrt((p1[1]-p2[1])^2+(p1[2]-p2[2])^2+k_α^2*((p1[3]-p2[3]+pi)%pi-pi)^2)
 end
 
-function stop_from_to(p1::Array{Float64,1}, p2::Array{Float64,1})
-    if dist(p1, p2)< ε
+function transition(p1::Array{Float64,1}, p2::Array{Float64,1})
+    if (dist(p1, p2) < ε) & (((p1[3]-p2[3]+pi)%pi-pi) < α)
         return p2
     else
-        theta = atan2(p2[2]-p1[2], p2[1]-p1[1])
-        return Float64[p1[1] + ε*cos(theta), p1[2] + ε*sin(theta)]
+        return Float64[p1[1] + ε*cos(p1[3]+randn()*.4),
+        p1[2] + ε*sin(p1[3]+randn()*.4), p1[3]+randn()*.4]
     end
 end
 
 # RRT algorithm
-for i in 1:n_iter
-    r_v = rand(2).*Float64[10,10] # random vertex
+iter = 0
+while iter < n_iter
+    r_v = rand(3).*Float64[10,10,2*pi] # random vertex
     c_v = id_start # closest vertex
     for p in g.vertices
         if dist(r_v, nodes[p]) < dist(nodes[c_v], nodes[p])
@@ -48,7 +49,7 @@ for i in 1:n_iter
     end
 
     # create new vertex and edge
-    n_v = stop_from_to(nodes[c_v], r_v)
+    n_v = transition(nodes[c_v], r_v)
 
     # check if allowed
     if !is_allowed(n_v)
@@ -59,6 +60,7 @@ for i in 1:n_iter
     new_id = length(nodes)
     add_vertex!(g, new_id) # start
     add_edge!(g, c_v, new_id)
+    iter+=1
 end
 println("Plotting data")
 m_nodes = hcat(nodes...)' # matrix with value of nodes
@@ -89,6 +91,3 @@ while true
     plt[:plot](m_nodes[[ie[1].source, c_v],1], m_nodes[[ie[1].source, c_v],2], "r")
     c_v = ie[1].source
 end
-    
-
-
