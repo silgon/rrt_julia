@@ -2,7 +2,7 @@
 # goal = Float64[10, 10, π]
 start = Float64[1, 1]
 goal = Float64[10, 10]
-ε = 0.5 # meters
+ε = 0.3 # meters
 n_iter = 8000
 using Graphs
 
