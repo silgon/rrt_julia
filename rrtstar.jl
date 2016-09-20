@@ -1,7 +1,7 @@
 start = Float64[1, 1]
 goal = Float64[9, 9]
 ε = 0.4 # meters
-n_iter = 4000
+n_iter = 10000
 using Graphs
 
 g = graph(Int[], Graphs.IEdge[], is_directed=true)

@@ -1,9 +1,11 @@
-start = Float64[3, 3, π/4]
-goal = Float64[8, 2, -π/4]
+start = Float64[3, 3, π]
+goal = Float64[9, 9, 0]
+# start = Float64[3, 3, π/4]
+# goal = Float64[8, 2, -π/4]
 ε = 0.4 # meters
 α = pi/16
-k_α = .3
-n_iter = 15000
+k_α = 1
+n_iter = 10000
 using Graphs
 
 g = graph(Int[], Graphs.IEdge[], is_directed=true)
@@ -32,8 +34,8 @@ function transition(p1::Array{Float64,1}, p2::Array{Float64,1})
     if (dist(p1, p2) < ε) & (((p1[3]-p2[3]+pi)%pi-pi) < α)
         return p2
     else
-        return Float64[p1[1] + ε*cos(p1[3]+randn()*.4),
-        p1[2] + ε*sin(p1[3]+randn()*.4), p1[3]+randn()*.4]
+        return Float64[p1[1] + ε*cos(p1[3]+randn()*.2),
+        p1[2] + ε*sin(p1[3]+randn()*.2), p1[3]+randn()*.2]
     end
 end
 
@@ -42,11 +44,8 @@ iter = 0
 while iter < n_iter
     r_v = rand(3).*Float64[10,10,2*pi] # random vertex
     c_v = id_start # closest vertex
-    for p in g.vertices
-        if dist(r_v, nodes[p]) < dist(nodes[c_v], nodes[p])
-            c_v = p
-        end
-    end
+
+    _, c_v = findmin(map(x->dist(r_v, nodes[x]), g.vertices))
 
     # create new vertex and edge
     n_v = transition(nodes[c_v], r_v)
@@ -60,7 +59,7 @@ while iter < n_iter
     new_id = length(nodes)
     add_vertex!(g, new_id) # start
     add_edge!(g, c_v, new_id)
-    iter+=1
+    iter += 1
 end
 println("Plotting data")
 m_nodes = hcat(nodes...)' # matrix with value of nodes
@@ -74,12 +73,7 @@ for ed in g.edges
 end
 
 # find closest node to goal
-g_v = id_start # closest vertex
-for p in g.vertices
-    if dist(goal, nodes[p]) < dist(nodes[g_v], nodes[p])
-        g_v = p
-    end
-end
+_, g_v = findmin(map(x->dist(goal,nodes[x]), g.vertices))
 
 # navigate from goal to beginning
 c_v = g_v # current vertex
