@@ -43,12 +43,6 @@ while iter < n_iter
 
     _, c_v = findmin(map(x->dist(r_v, nodes[x]), g.vertices))
 
-    # for p in g.vertices
-    #     if dist(r_v, nodes[p]) < dist(r_v, nodes[c_v])
-    #         c_v = p
-    #     end
-    # end
-
     # create new vertex and edge
     n_v = stop_from_to(nodes[c_v], r_v)
 
@@ -74,13 +68,6 @@ for ed in g.edges
                m_nodes[[ed.source, ed.target],2], "b", linewidth=0.3)
 end
 
-# find closest node to goal
-# g_v = id_start # closest vertex
-# for p in g.vertices
-#     if dist(goal, nodes[p]) < dist(goal, nodes[g_v])
-#         g_v = p
-#     end
-# end
 
 _, g_v = findmin(map(x->dist(goal,nodes[x]), g.vertices))
 
