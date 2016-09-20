@@ -1,9 +1,7 @@
-# start = Float64[0, 0, 0]
-# goal = Float64[10, 10, π]
 start = Float64[1, 1]
-goal = Float64[10, 10]
+goal = Float64[9, 9]
 ε = 0.4 # meters
-n_iter = 8000
+n_iter = 4000
 using Graphs
 
 g = graph(Int[], Graphs.IEdge[], is_directed=true)
@@ -38,14 +36,18 @@ function stop_from_to(p1::Array{Float64,1}, p2::Array{Float64,1})
 end
 
 # RRT algorithm
-for i in 1:n_iter
+iter = 0
+while iter < n_iter
     r_v = rand(2).*Float64[10,10] # random vertex
     c_v = id_start # closest vertex
-    for p in g.vertices
-        if dist(r_v, nodes[p]) < dist(nodes[c_v], nodes[p])
-            c_v = p
-        end
-    end
+
+    _, c_v = findmin(map(x->dist(r_v, nodes[x]), g.vertices))
+
+    # for p in g.vertices
+    #     if dist(r_v, nodes[p]) < dist(r_v, nodes[c_v])
+    #         c_v = p
+    #     end
+    # end
 
     # create new vertex and edge
     n_v = stop_from_to(nodes[c_v], r_v)
@@ -59,6 +61,7 @@ for i in 1:n_iter
     new_id = length(nodes)
     add_vertex!(g, new_id) # start
     add_edge!(g, c_v, new_id)
+    iter += 1
 end
 println("Plotting data")
 m_nodes = hcat(nodes...)' # matrix with value of nodes
@@ -72,12 +75,14 @@ for ed in g.edges
 end
 
 # find closest node to goal
-g_v = id_start # closest vertex
-for p in g.vertices
-    if dist(goal, nodes[p]) < dist(nodes[g_v], nodes[p])
-        g_v = p
-    end
-end
+# g_v = id_start # closest vertex
+# for p in g.vertices
+#     if dist(goal, nodes[p]) < dist(goal, nodes[g_v])
+#         g_v = p
+#     end
+# end
+
+_, g_v = findmin(map(x->dist(goal,nodes[x]), g.vertices))
 
 # navigate from goal to beginning
 c_v = g_v # current vertex
@@ -89,6 +94,3 @@ while true
     plt[:plot](m_nodes[[ie[1].source, c_v],1], m_nodes[[ie[1].source, c_v],2], "r")
     c_v = ie[1].source
 end
-    
-
-
