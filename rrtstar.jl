@@ -26,7 +26,7 @@ function dist(p1::Array{Float64,1}, p2::Array{Float64,1})
     sqrt((p1[1]-p2[1])^2+(p1[2]-p2[2])^2)
 end
 
-function stop_from_to(p1::Array{Float64,1}, p2::Array{Float64,1})
+function transition(p1::Array{Float64,1}, p2::Array{Float64,1})
     if dist(p1, p2)< ε
         return p2
     else
@@ -44,7 +44,7 @@ while iter < n_iter
     _, c_v = findmin(map(x->dist(r_v, nodes[x]), g.vertices))
 
     # create new vertex and edge
-    n_v = stop_from_to(nodes[c_v], r_v)
+    n_v = transition(nodes[c_v], r_v)
 
     # check if allowed
     if !is_allowed(n_v)
