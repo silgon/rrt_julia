@@ -23,6 +23,8 @@ max_s = 0.000001 # max sampled
 start = Float64[3, 3, π]
 start = rand(3)*10
 ε = 0.4 # meters
+α = pi/16
+k_α = 1
 n_iter = 2000
 using Graphs
 
