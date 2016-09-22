@@ -18,7 +18,8 @@ m = MixtureModel(mvs, w)
 # access the costmap with: pdf(m, [x, y])
 ##### END OF COSTMAP  ################
 
-max_s = 0.000001 # max sampled
+max_s = -1000 # max sampled
+min_s = 1000 # min sampled
 
 # start = Float64[1, 1]
 start = rand(2)*10
@@ -60,14 +61,17 @@ while iter < n_iter
     r_v = rand(2).*Float64[10,10] # random vertex
 
     c_s = pdf(m, r_v)
-    if c_s > max_s
+    if max_s < c_s
         max_s = c_s
+    elseif min_s > c_s
+        min_s = c_s
     end
+
     # flip a coin
-    if rand() > (c_s/max_s)^3
+    if (max_s < min_s) | (rand() > ((c_s-min_s)/(max_s-min_s))^3)
         continue
     end
-    # println(c_s,max_s,c_s/max_s)
+    # println(c_s,",",max_s,",",min_s,",",c_s/max_s)
 
     # nearest vertex to random position
     _, c_v = findmin(map(x->dist(r_v, nodes[x]), g.vertices))
