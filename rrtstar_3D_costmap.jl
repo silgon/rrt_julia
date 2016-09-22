@@ -44,11 +44,11 @@ function is_allowed(state::Array{Float64, 1})
 end
 
 function dist(p1::Array{Float64,1}, p2::Array{Float64,1})
-    sqrt((p1[1]-p2[1])^2+(p1[2]-p2[2])^2+k_α^2*((p1[3]-p2[3]+pi)%pi-pi)^2)
+    sqrt((p1[1]-p2[1])^2+(p1[2]-p2[2])^2+k_α^2*((p1[3]-p2[3]+pi)%2pi-pi)^2)
 end
 
 function transition(p1::Array{Float64,1}, p2::Array{Float64,1})
-    if (dist(p1, p2) < ε) & (((p1[3]-p2[3]+pi)%pi-pi) < α)
+    if (dist(p1, p2) < ε) & (((p1[3]-p2[3]+pi)%2pi-pi) < α)
         return p2
     else
         return Float64[p1[1] + ε*cos(p1[3]+randn()*.2),
