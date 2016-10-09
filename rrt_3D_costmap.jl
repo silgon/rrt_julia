@@ -18,6 +18,7 @@ m = MixtureModel(mvs, w)
 # access the costmap with: pdf(m, [x, y])
 ##### END OF COSTMAP  ################
 
+srand()
 max_s = -1000 # max sampled
 min_s = 1000 # min sampled
 
@@ -49,12 +50,8 @@ function dist(p1::Array{Float64,1}, p2::Array{Float64,1})
 end
 
 function transition(p1::Array{Float64,1}, p2::Array{Float64,1})
-    if (dist(p1, p2) < ε) & (((p1[3]-p2[3]+pi)%2pi-pi) < α)
-        return p2
-    else
-        return Float64[p1[1] + ε*cos(p1[3]+randn()*.2),
-        p1[2] + ε*sin(p1[3]+randn()*.2), p1[3]+randn()*.2]
-    end
+    return Float64[p1[1] + ε*cos(p1[3]+randn()*.2),
+                   p1[2] + ε*sin(p1[3]+randn()*.2), p1[3]+randn()*.2]
 end
 
 # RRT algorithm
@@ -69,7 +66,7 @@ while iter < n_iter
         min_s = c_s
     end
     # flip a coin
-    if (max_s < min_s) | (rand() > ((c_s-min_s)/(max_s-min_s))^3)
+    if (max_s < min_s) | (rand() > ((c_s-min_s)/(max_s-min_s))^2)
         continue
     end
     # println(c_s,max_s,c_s/max_s)
