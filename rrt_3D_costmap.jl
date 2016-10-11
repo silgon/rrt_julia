@@ -91,6 +91,7 @@ println("Plotting data")
 m_nodes = hcat(nodes...)' # matrix with value of nodes
 using PyCall, PyPlot
 @pyimport seaborn as sns
+sns.set_style("whitegrid")
 plt = sns.plt
 plt[:clf]()
 for ed in g.edges
