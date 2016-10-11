@@ -95,7 +95,6 @@ using PyCall, PyPlot
 @pyimport seaborn as sns
 sns.set_style("whitegrid")
 plt = sns.plt
-# plt[:figure](1,figsize=(8,8))
 plt[:clf]()
 for ed in g.edges
     plt[:plot](m_nodes[[ed.source, ed.target],1],
